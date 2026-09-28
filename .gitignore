@@ -1,0 +1,63 @@
+# ─── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+.Python
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# ─── Large model files (too big for GitHub) ────────────────────────────────────
+# The models in the root are 300MB+, skip them.
+# The one inside EdgeAI/data/ (model.pkl ~790KB) is fine and will be included.
+/model.pkl
+/model_80.pkl
+/model_98.pkl
+
+# ─── Data files (large raw CSV) ───────────────────────────────────────────────
+EdgeAI/data/combined_real_data.csv
+EdgeAI/data/raw/
+EdgeAI/data/raw_v1_sensor_layout/
+EdgeAI/data/raw_v2_20260831_predamage/
+
+# ─── macOS junk ───────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ─── Editors ──────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ─── Node / Frontend (if added later) ─────────────────────────────────────────
+node_modules/
+.env
+.env.local
+.env.*.local
+npm-debug.log*
+yarn-error.log*
+
+# ─── Jupyter ──────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ─── Personal notes / local files ────────────────────────────────────────────
+Claude-*.md
+
+# ─── Misc ─────────────────────────────────────────────────────────────────────
+*.log
+*.sqlite
+*.db
