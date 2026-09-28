@@ -1,0 +1,1 @@
+"""WebSocket event envelope and payload schemas."""
