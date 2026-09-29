@@ -66,6 +66,7 @@ class Settings(BaseSettings):
     # --- Security ---
     secret_key: str = ""
     access_token_expire_minutes: int = 60
+    edge_api_key: str = Field(default="", repr=False)
 
     @property
     def cors_origin_list(self) -> list[str]:

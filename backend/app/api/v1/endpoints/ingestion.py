@@ -7,6 +7,7 @@ not by the frontend. Drives the end-to-end pipeline.
 from fastapi import APIRouter, Depends, status
 
 from app.api.deps import get_prediction_service
+from app.core.security import verify_api_key
 from app.schemas.common import SuccessResponse
 from app.schemas.prediction import PredictionCreate, PredictionRead
 from app.services.prediction import PredictionService
@@ -18,6 +19,7 @@ router = APIRouter(prefix="/internal", tags=["internal"])
     "/predictions",
     response_model=SuccessResponse[PredictionRead],
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(verify_api_key)],
 )
 async def ingest_prediction(
     payload: PredictionCreate,

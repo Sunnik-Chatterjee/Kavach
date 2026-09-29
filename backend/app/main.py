@@ -15,6 +15,7 @@ from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.exceptions import AppError
 from app.core.logging import get_logger, setup_logging
+from app.core.security import APIKeyAuthenticationError
 from app.database.init_db import init_db
 from app.database.session import engine
 
@@ -67,6 +68,21 @@ def create_app() -> FastAPI:
             request.method,
             request.url.path,
             exc.message,
+        )
+
+    @app.exception_handler(APIKeyAuthenticationError)
+    async def api_key_authentication_error_handler(
+        request: Request, exc: APIKeyAuthenticationError
+    ) -> JSONResponse:
+        """Return the stable authentication error envelope with HTTP 401."""
+        logger.warning(
+            "API key authentication failed on %s %s",
+            request.method,
+            request.url.path,
+        )
+        return JSONResponse(
+            status_code=401,
+            content={"success": False, "message": exc.message},
         )
         return JSONResponse(
             status_code=exc.status_code,

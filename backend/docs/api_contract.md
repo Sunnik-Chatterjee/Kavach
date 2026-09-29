@@ -12,12 +12,12 @@
 
 # Authentication
 
-> Not implemented yet.
-
-Future implementation:
+`POST /internal/predictions` requires the Edge AI API key in the `X-API-Key`
+header. Configure the expected value through the `EDGE_API_KEY` environment
+variable; requests are rejected if it is missing or invalid.
 
 ```http
-X-API-KEY: <your-api-key>
+X-API-Key: <your-edge-api-key>
 ```
 
 ---
@@ -52,6 +52,32 @@ Check backend availability and status.
 ### Purpose
 
 Receive ML prediction from the Edge AI inference service.
+
+### Required Header
+
+```http
+X-API-Key: <your-edge-api-key>
+```
+
+### Authentication Errors
+
+Missing header, HTTP 401:
+
+```json
+{
+  "success": false,
+  "message": "Missing API key"
+}
+```
+
+Invalid key, HTTP 401:
+
+```json
+{
+  "success": false,
+  "message": "Invalid API key"
+}
+```
 
 ### Request Body
 
