@@ -3,7 +3,6 @@
 Explicit database operations for predictions. No business logic.
 """
 
-import uuid
 from datetime import datetime
 
 from sqlalchemy import case, func, select
@@ -17,6 +16,7 @@ class PredictionRepository:
     """Data-access operations for the Prediction entity."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Bind prediction queries to the request-scoped database session."""
         self._session = session
 
     async def create(self, data: PredictionCreate) -> Prediction:
@@ -50,19 +50,23 @@ class PredictionRepository:
 
         Filters by fault_label when provided. Ordered newest-first.
         """
-        base = select(Prediction)
-        count_stmt = select(func.count()).select_from(Prediction)
+        prediction_statement = select(Prediction)
+        count_statement = select(func.count()).select_from(Prediction)
         if fault_label:
-            base = base.where(Prediction.fault_label == fault_label)
-            count_stmt = count_stmt.where(Prediction.fault_label == fault_label)
+            prediction_statement = prediction_statement.where(
+                Prediction.fault_label == fault_label
+            )
+            count_statement = count_statement.where(
+                Prediction.fault_label == fault_label
+            )
 
-        total = (await self._session.execute(count_stmt)).scalar_one()
+        total_count = (await self._session.execute(count_statement)).scalar_one()
         result = await self._session.execute(
-            base.order_by(Prediction.prediction_timestamp.desc())
+            prediction_statement.order_by(Prediction.prediction_timestamp.desc())
             .offset((page - 1) * size)
             .limit(size)
         )
-        return list(result.scalars().all()), total
+        return list(result.scalars().all()), total_count
 
     async def count(self) -> int:
         """Return the total number of predictions."""
@@ -82,9 +86,7 @@ class PredictionRepository:
 
     async def average_confidence(self) -> float:
         """Return the mean confidence across all predictions (0 if none)."""
-        result = await self._session.execute(
-            select(func.avg(Prediction.confidence))
-        )
+        result = await self._session.execute(select(func.avg(Prediction.confidence)))
         avg = result.scalar_one()
         return float(avg) if avg is not None else 0.0
 
@@ -119,10 +121,3 @@ class PredictionRepository:
         ).group_by(Prediction.fault_label)
         result = await self._session.execute(statement)
         return {label: int(count) for label, count in result.all()}
-
-    async def get_by_id(self, prediction_id: uuid.UUID) -> Prediction | None:
-        """Return a prediction by its UUID, or None if not found."""
-        result = await self._session.execute(
-            select(Prediction).where(Prediction.id == prediction_id)
-        )
-        return result.scalar_one_or_none()

@@ -12,6 +12,7 @@ from app.schemas.prediction import (
     PredictionRead,
     PredictionStats,
 )
+from app.services.alert_service import AlertService
 from app.websocket.manager import manager
 
 # The EdgeAI model's non-fault class. Everything else counts as a fault.
@@ -21,19 +22,25 @@ NORMAL_LABEL = "healthy"
 class PredictionService:
     """Orchestrates prediction persistence and queries."""
 
-    def __init__(self, repository: PredictionRepository) -> None:
+    def __init__(
+        self, repository: PredictionRepository, alert_service: AlertService
+    ) -> None:
+        """Bind prediction operations to their repository and alert service."""
         self._repository = repository
+        self._alert_service = alert_service
 
     async def create_prediction(self, data: PredictionCreate) -> PredictionRead:
         """Persist a new prediction and return it as a read model."""
-        prediction = await self._repository.create(data)
-        prediction_read = PredictionRead.model_validate(prediction)
-        
+        prediction_record = await self._repository.create(data)
+        prediction_read = PredictionRead.model_validate(prediction_record)
+
+        await self._alert_service.process_live_update(data)
+
         # Broadcast prediction created event
         await manager.broadcast_prediction_created(
             prediction_read.model_dump(mode="json")
         )
-        
+
         return prediction_read
 
     async def get_latest(self) -> PredictionRead | None:
@@ -81,17 +88,19 @@ class PredictionService:
 
     async def get_dashboard_summary(self) -> DashboardSummary:
         """Build dashboard metrics with the newest prediction."""
-        total, healthy, average_confidence = (
-            await self._repository.get_dashboard_metrics(healthy_label=NORMAL_LABEL)
-        )
-        latest = await self._repository.get_latest()
+        (
+            total_count,
+            healthy_count,
+            average_confidence,
+        ) = await self._repository.get_dashboard_metrics(healthy_label=NORMAL_LABEL)
+        latest_prediction = await self._repository.get_latest()
         return DashboardSummary(
-            total_predictions=total,
-            healthy_count=healthy,
-            fault_count=total - healthy,
+            total_predictions=total_count,
+            healthy_count=healthy_count,
+            fault_count=total_count - healthy_count,
             average_confidence=average_confidence,
-            latest_prediction=PredictionRead.model_validate(latest)
-            if latest is not None
+            latest_prediction=PredictionRead.model_validate(latest_prediction)
+            if latest_prediction is not None
             else None,
         )
 

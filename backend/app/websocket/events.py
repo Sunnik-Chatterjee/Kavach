@@ -1,4 +1,5 @@
-"""WebSocket event name constants and event builders."""
+"""WebSocket message type constants."""
 
-# Event names for WebSocket communication
 PREDICTION_CREATED = "PREDICTION_CREATED"
+ALERT_CREATED = "alert"
+ALERT_UPDATED = "alert_updated"

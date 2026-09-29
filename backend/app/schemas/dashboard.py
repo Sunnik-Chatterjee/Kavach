@@ -41,6 +41,8 @@ class FaultDistribution(RootModel[dict[str, int]]):
 
     model_config = ConfigDict(
         json_schema_extra={
-            "examples": [{"healthy": 82, "bearing_fault_near": 10, "bearing_fault_far": 5}]
+            "examples": [
+                {"healthy": 82, "bearing_fault_near": 10, "bearing_fault_far": 5}
+            ]
         }
     )

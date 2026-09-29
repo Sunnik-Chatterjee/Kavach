@@ -16,6 +16,8 @@ class PredictionCreate(BaseModel):
         ...,
         description="Full label -> probability map.",
     )
+    event_type: str | None = Field(default=None, min_length=1, max_length=128)
+    source_device_id: str | None = Field(default=None, max_length=128)
     prediction_timestamp: datetime | None = Field(
         default=None,
         description="Time the ML layer produced the prediction. Defaults to now.",

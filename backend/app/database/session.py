@@ -18,9 +18,7 @@ logger = get_logger(__name__)
 def create_engine() -> AsyncEngine:
     """Create the async SQLAlchemy engine from settings."""
     if not settings.database_url:
-        raise RuntimeError(
-            "DATABASE_URL is not configured. Set it in your .env file."
-        )
+        raise RuntimeError("DATABASE_URL is not configured. Set it in your .env file.")
     return create_async_engine(
         settings.database_url,
         echo=settings.debug,

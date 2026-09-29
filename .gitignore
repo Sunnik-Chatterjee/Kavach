@@ -16,24 +16,42 @@ venv/
 env/
 ENV/
 
-# ─── Large model files (too big for GitHub) ────────────────────────────────────
-# The models in the root are 300MB+, skip them.
-# The one inside EdgeAI/data/ (model.pkl ~790KB) is fine and will be included.
+# ─── Environment Variables ────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ─── Python Tooling ───────────────────────────────────────────────────────────
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# ─── Large model files ────────────────────────────────────────────────────────
 /model.pkl
 /model_80.pkl
 /model_98.pkl
 
-# ─── Data files (large raw CSV) ───────────────────────────────────────────────
+# ─── Data files ───────────────────────────────────────────────────────────────
 EdgeAI/data/combined_real_data.csv
 EdgeAI/data/raw/
 EdgeAI/data/raw_v1_sensor_layout/
 EdgeAI/data/raw_v2_20260831_predamage/
+
+# ─── Alembic ──────────────────────────────────────────────────────────────────
+# Keep migration scripts tracked
+# alembic/versions/
 
 # ─── macOS junk ───────────────────────────────────────────────────────────────
 .DS_Store
 .AppleDouble
 .LSOverride
 ._*
+
+# ─── Windows junk ─────────────────────────────────────────────────────────────
+Thumbs.db
+Desktop.ini
 
 # ─── Editors ──────────────────────────────────────────────────────────────────
 .vscode/
@@ -42,22 +60,29 @@ EdgeAI/data/raw_v2_20260831_predamage/
 *.swo
 *~
 
-# ─── Node / Frontend (if added later) ─────────────────────────────────────────
+# ─── Node / Frontend ──────────────────────────────────────────────────────────
 node_modules/
-.env
-.env.local
-.env.*.local
 npm-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
 # ─── Jupyter ──────────────────────────────────────────────────────────────────
 .ipynb_checkpoints/
 *.ipynb
 
-# ─── Personal notes / local files ────────────────────────────────────────────
+# ─── Personal Notes ───────────────────────────────────────────────────────────
 Claude-*.md
+.agent/
 
-# ─── Misc ─────────────────────────────────────────────────────────────────────
+# ─── Logs ─────────────────────────────────────────────────────────────────────
 *.log
+logs/
+
+# ─── Database ────────────────────────────────────────────────────────────────
 *.sqlite
 *.db
+
+# ─── Temporary Files ──────────────────────────────────────────────────────────
+tmp/
+temp/
+.cache/

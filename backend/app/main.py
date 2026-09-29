@@ -4,6 +4,7 @@ Creates the application, wires configuration, CORS, exception handlers, and
 the WebSocket manager lifecycle.
 """
 
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -21,7 +22,7 @@ logger = get_logger(__name__)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Application lifespan: create tables on startup, dispose engine on shutdown."""
     setup_logging()
     logger.info("Starting %s v%s", settings.app_name, settings.app_version)
@@ -79,9 +80,7 @@ def create_app() -> FastAPI:
     @app.exception_handler(Exception)
     async def unhandled_error_handler(request: Request, exc: Exception) -> JSONResponse:
         """Catch-all handler returning a generic 500 envelope."""
-        logger.exception(
-            "Unhandled error on %s %s", request.method, request.url.path
-        )
+        logger.exception("Unhandled error on %s %s", request.method, request.url.path)
         return JSONResponse(
             status_code=500,
             content={

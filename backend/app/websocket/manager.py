@@ -8,7 +8,10 @@ accepts sockets) and the service layer (which broadcasts events).
 """
 
 from typing import Any
+
 from fastapi import WebSocket
+
+from app.websocket.events import ALERT_CREATED, ALERT_UPDATED, PREDICTION_CREATED
 
 
 class ConnectionManager:
@@ -39,8 +42,34 @@ class ConnectionManager:
     async def broadcast_prediction_created(self, prediction_data: Any) -> None:
         """Broadcast a prediction created event to all connected clients."""
         event = {
-            "event": "PREDICTION_CREATED",
+            "event": PREDICTION_CREATED,
             "data": prediction_data,
+        }
+        await self.broadcast(event)
+
+    async def broadcast_alert_created(self, alert_data: Any) -> None:
+        """Broadcast a newly created alert to connected clients."""
+        event = {
+            "type": ALERT_CREATED,
+            "id": alert_data["id"],
+            "severity": alert_data["severity"],
+            "title": alert_data["title"],
+            "description": alert_data["description"],
+            "timestamp": alert_data["created_at"],
+            "high_priority": alert_data["high_priority"],
+        }
+        await self.broadcast(event)
+
+    async def broadcast_alert_updated(self, alert_data: Any) -> None:
+        """Broadcast an existing alert after a severity escalation."""
+        event = {
+            "type": ALERT_UPDATED,
+            "id": alert_data["id"],
+            "severity": alert_data["severity"],
+            "title": alert_data["title"],
+            "description": alert_data["description"],
+            "timestamp": alert_data["timestamp"],
+            "high_priority": alert_data["high_priority"],
         }
         await self.broadcast(event)
 

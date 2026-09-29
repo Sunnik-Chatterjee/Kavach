@@ -62,9 +62,14 @@ Receive ML prediction from the Edge AI inference service.
   "probabilities_json": {
     "healthy": 0.08,
     "bearing_fault_near": 0.92
-  }
+  },
+  "event_type": "intrusion_detected",
+  "source_device_id": "camera-01"
 }
 ```
+
+`event_type` and `source_device_id` are optional. When `event_type` is omitted,
+the backend evaluates `fault_label`. LOW severity updates do not create alerts.
 
 ### Response
 
@@ -215,6 +220,38 @@ The frontend should maintain a single persistent WebSocket connection.
 - Update dashboard statistics
 - Refresh fault distribution chart
 - Display warning notification when fault_label != "healthy"
+
+---
+
+# Alert Module
+
+## GET /alerts
+
+Returns newest-first paginated alerts. Supports `page`, `size`, `severity`,
+`acknowledged`, and `resolved` query parameters.
+
+## GET /alerts/{id}
+
+Returns one alert by UUID.
+
+## PATCH /alerts/{id}/acknowledge
+
+Marks an alert as acknowledged.
+
+## PATCH /alerts/{id}/resolve
+
+Marks an alert as resolved.
+
+Only MEDIUM, HIGH, and CRITICAL events are stored in the alerts table. New
+alerts are broadcast over the existing WebSocket connection with `type: "alert"`;
+HIGH and CRITICAL alert payloads include `high_priority: true`.
+Healthy predictions never create alerts. Other events below 0.60 confidence are
+skipped; confidence from 0.60 to below 0.80 creates MEDIUM alerts, 0.80 to below
+0.95 creates HIGH alerts, and 0.95 or above creates CRITICAL alerts. A matching
+unresolved event is deduplicated for five minutes; resolving it allows a new
+alert to be created immediately. If a matching unresolved alert receives a
+higher severity within that window, the existing alert is updated and an
+`alert_updated` WebSocket event is broadcast instead of creating another row.
 
 ---
 

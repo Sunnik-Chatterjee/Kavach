@@ -71,7 +71,9 @@ class Settings(BaseSettings):
     def cors_origin_list(self) -> list[str]:
         """Return the parsed CORS origins as a list."""
         if isinstance(self.cors_origins, str):
-            cleaned = self.cors_origins.strip().strip("[]").replace('"', "").replace("'", "")
+            cleaned = (
+                self.cors_origins.strip().strip("[]").replace('"', "").replace("'", "")
+            )
             return [o.strip() for o in cleaned.split(",") if o.strip()]
         return list(self.cors_origins)
 

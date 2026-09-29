@@ -26,6 +26,20 @@ class Severity(StrEnum):
     CRITICAL = "CRITICAL"
 
 
+ALERT_DEDUP_WINDOW_MINUTES = 5
+CONFIDENCE_MEDIUM_THRESHOLD = 0.60
+CONFIDENCE_HIGH_THRESHOLD = 0.80
+CONFIDENCE_CRITICAL_THRESHOLD = 0.95
+HEALTHY_LABELS = frozenset({"healthy", "normal"})
+SEVERITY_RANK: dict[Severity, int] = {
+    Severity.LOW: 0,
+    Severity.MEDIUM: 1,
+    Severity.HIGH: 2,
+    Severity.CRITICAL: 3,
+}
+DEFAULT_CONFIDENCE_THRESHOLD: float = 0.8
+
+
 class FaultLabel(StrEnum):
     """Machine condition classes produced by the ML model."""
 
@@ -50,7 +64,3 @@ class SecurityEventType(StrEnum):
     UNAUTHORIZED_ACCESS = "UNAUTHORIZED_ACCESS"
     COMMUNICATION_ANOMALY = "COMMUNICATION_ANOMALY"
     SENSOR_TAMPERING = "SENSOR_TAMPERING"
-
-
-# Default confidence threshold (0-1) above which a fault triggers an alert.
-DEFAULT_CONFIDENCE_THRESHOLD: float = 0.8
