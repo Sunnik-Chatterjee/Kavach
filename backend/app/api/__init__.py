@@ -1,0 +1,1 @@
+"""API layer: routers, dependency injection, and versioned endpoints."""
